@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Gift Idea 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #fce4ec;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Mengubah dari center ke flex-start agar halaman dapat digulir dari atas saat memanjang */
+            min-height: 100vh;
+            color: #4a4a4a;
+            position: relative;
+            overflow-y: auto; /* Mengaktifkan scroll vertikal (naik turun) pada seluruh halaman */
+            overflow-x: hidden; /* Mencegah pergeseran ke kanan-kiri yang merusak tampilan */
+            padding: 20px 10px; /* Memberi jarak atas bawah saat halaman di-scroll */
+            scroll-behavior: smooth;
+        }
+
+        /* --- VIDEO LATAR BELAKANG OFFLINE --- */
+        .bg-video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Di belakang konten utama */
+            overflow: hidden;
+        }
+
+        .bg-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Menutupi seluruh layar latar belakang */
+        }
+
+        /* --- ANIMASI LOVE BERJATUHAN --- */
+        .heart-fall {
+            position: fixed;
+            top: -20px;
+            font-size: 20px;
+            color: #ff6090;
+            user-select: none;
+            pointer-events: none;
+            z-index: 0; /* Di belakang container utama, di depan/atas video background */
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(360deg);
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.95); /* Sedikit transparan agar latar belakang terlihat samar */
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 8px solid #f8bbd0;
+            position: relative;
+            z-index: 1; /* Di atas video latar belakang dan efek love */
+            margin: auto; /* Membantu posisi container tetap seimbang di tengah */
+        }
+
+        /* --- SCREEN 1: PASSCODE --- */
+        #passcode-screen {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ec407a;
+            margin-bottom: 25px;
+        }
+
+        .passcode-box {
+            background-color: #fbc02d1a;
+            border: 2px dashed #fbc02d;
+            border-radius: 15px;
+            padding: 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-direction: column; /* Mengoptimalkan keypad di layar HP agar tersusun rapi kebawah */
+        }
+
+        @media (min-width: 380px) {
+            .passcode-box {
+                flex-direction: row; /* Kembali ke baris jika layar dirasa cukup lebar */
+            }
+        }
+
+        .profile-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px solid #f8bbd0;
+            overflow: hidden;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .profile-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .keypad-wrapper {
+            width: 100%;
+            flex: 1;
+        }
+
+        .display-pass {
+            width: 100%;
+            background: #fff;
+            border: 1px solid #f8bbd0;
+            border-radius: 8px;
+            padding: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #ec407a;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+
+        .key {
+            background: #fff;
+            border: 1px solid #f8bbd0;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #d81b60;
+        }
+
+        .key:active {
+            background: #f8bbd0;
+            color: #fff;
+        }
+
+        /* --- SCREEN 2: MAIN CONTENT --- */
+        #main-screen {
+            display: none;
+            padding: 20px;
+        }
+
+        .header-banner {
+            background-color: #f8bbd0;
+            color: #d81b60;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .main-card {
+            background: #fff;
+            border: 2px solid #f8bbd0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 180px;
+            position: relative;
+            background: #e0e0e0;
+        }
+
+        .hero-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.75));
+            color: white;
+            padding: 15px 10px 10px 10px;
+            font-size: 13px;
+        }
+
+        .hero-text h3 {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: #fff;
+            border: 2px solid #f8bbd0;
+            padding: 8px 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ec407a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #f8bbd0;
+            color: white;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            background: #fff;
+            border: 2px dashed #f8bbd0;
+            border-radius: 12px;
+            padding: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tab Profile Layout */
+        .profile-tab-content {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-direction: column; /* Rapi kebawah jika di layar kecil */
+        }
+
+        @media (min-width: 360px) {
+            .profile-tab-content {
+                flex-direction: row;
+            }
+        }
+
+        .profile-tab-img {
+            width: 110px;
+            height: 140px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #f8bbd0;
+            background: #e0e0e0;
+        }
+
+        .profile-tab-text h4 {
+            color: #d81b60;
+            margin-bottom: 5px;
+        }
+
+        .profile-tab-text p {
+            font-size: 12px;
+            line-height: 1.5;
+            text-align: justify;
+        }
+
+        /* Galeri Film Strip */
+        .film-strip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: #111;
+            padding: 20px 10px;
+            border-radius: 8px;
+            max-height: 450px; 
+            overflow-y: auto; /* Bagian galeri foto ini juga tetap bisa di-scroll internal */
+        }
+
+        .film-frame {
+            width: 90%;
+            height: auto;
+            min-height: 150px;
+            max-height: 280px;
+            border: 4px solid #fff;
+            background: #222;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .film-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Tab Read Me (Letter) Layout */
+        .letter-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .envelope {
+            width: 120px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .letter-text {
+            display: none;
+            font-size: 13px;
+            line-height: 1.6;
+            background: #fff8fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f8bbd0;
+            margin-top: 10px;
+            text-align: left;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Collect Button */
+        .collect-btn {
+            display: block;
+            width: 100%;
+            background: #ec407a;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .collect-btn:hover {
+            background: #d81b60;
+        }
+
+        .watermark {
+            text-align: center;
+            font-size: 11px;
+            color: #b0bec5;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-video-container">
+    <video autoplay loop muted playsinline>
+        <source src="background.mp4" type="video/mp4">
+        Browser Anda tidak mendukung pemutar video.
+    </video>
+</div>
+
+<audio id="bg-music" src="perahu.mp3" loop></audio>
+
+<div class="container">
+    
+    <div id="passcode-screen">
+        <div class="title">happy birthday 💖</div>
+        
+        <div class="passcode-box">
+            <div class="profile-circle">
+                <img src="profil.jpg" alt="Foto Profil" onerror="this.style.display='none'">
+            </div>
+            
+            <div class="keypad-wrapper">
+                <div class="display-pass" id="pass-display">Enter Passcode</div>
+                <div class="keypad">
+                    <button class="key" onclick="pressKey('1')">1</button>
+                    <button class="key" onclick="pressKey('2')">2</button>
+                    <button class="key" onclick="pressKey('3')">3</button>
+                    <button class="key" onclick="pressKey('4')">4</button>
+                    <button class="key" onclick="pressKey('5')">5</button>
+                    <button class="key" onclick="pressKey('6')">6</button>
+                    <button class="key" onclick="pressKey('7')">7</button>
+                    <button class="key" onclick="pressKey('8')">8</button>
+                    <button class="key" onclick="pressKey('9')">9</button>
+                    <button class="key" onclick="clearKey()">-</button>
+                    <button class="key" onclick="pressKey('0')">0</button>
+                </div>
+                <div class="watermark">(Clue Nya tanggal ulang tahun sayang;)<br></div>
+            </div>
+        </div>
+        <div class="watermark">(made with love)<br><b>AzharRamadhan</b></div>
+    </div>
+
+    <div id="main-screen">
+        <div class="header-banner">happy birthday sayang!</div>
+        
+        <div class="main-card">
+            <div class="hero-image" style="height: auto; min-height: 180px;">
+                <video src="hero.mp4" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>
+                
+                <div class="hero-text">
+                    <h3>hi, twenties!</h3>
+                    <p>Wishing you a day filled with love, joy, and all the things that make you happiest ✨</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('profile')">👤 Profile</button>
+            <button class="tab-btn" onclick="switchTab('twenty')">🎂 Twenty</button>
+            <button class="tab-btn" onclick="switchTab('readme')">💌 Read Me</button>
+        </div>
+
+        <div id="profile-sec" class="content-section active">
+            <div class="profile-tab-content">
+                <img src="profil.jpg" class="profile-tab-img" alt="Foto Pacar" onerror="this.style.display='none'">
+                <div class="profile-tab-text">
+                    <h4>a little about u</h4>
+                    <p>She is a girl full of ambition and dreams. With a heart full of determination, she always gives her best in everything she does. For her, family is the greatest source of strength. Happy Birthday to my favorite person!</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="twenty-sec" class="content-section">
+            <div class="film-strip">
+                <div class="film-frame"><img src="foto1.jpg" alt="Momen 1" onerror="this.style.display='none'"></div>
+                <div class="film-frame"><img src="foto2.jpg" alt="Momen 2" onerror="this.style.display='none'"></div>
+                <div class="film-frame"><img src="foto3.jpg" alt="Momen 3" onerror="this.style.display='none'"></div>
+            </div>
+        </div>
+
+        <div id="readme-sec" class="content-section">
+            <div class="letter-container">
+                <svg class="envelope" id="envelope-icon" onclick="openLetter()" viewBox="0 0 24 24" fill="#f8bbd0" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                
+                <div class="letter-text" id="letter-content">
+                    <b>Happy Birthday Sayang! 💖</b><br><br>
+                    Di hari yang spesial ini, aku cuma mau bilang terima kasih udah hadir dan jadi bagian terindah di hidup aku. Semoga di umur yang baru ini kamu makin bahagia, tercapai semua impianmu, dan selalu dalam lindungan-Nya. I'm so proud of you, always! 🎁✨
+                </div>
+            </div>
+        </div>
+
+        <button class="collect-btn" onclick="alert('Kado virtual berhasil diklaim! 💝')">Collect</button>
+        <div class="watermark">(made with love)<br><b>AzhariRamadhan</b></div>
+    </div>
+
+</div>
+
+<script>
+    const CORRECT_PASSCODE = "2606"; 
+    let currentInput = "";
+
+    // SCRIPT ANIMASI MEMBUAT EFEK LOVE BERJATUHAN
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.classList.add('heart-fall');
+        heart.innerText = '💖';
+        
+        heart.style.left = Math.random() * 100 + "vw";
+        const duration = Math.random() * 3 + 3;
+        heart.style.animationDuration = duration + "s";
+        heart.style.fontSize = Math.random() * 15 + 12 + "px";
+        
+        document.body.appendChild(heart);
+        
+        setTimeout(() => {
+            heart.remove();
+        }, duration * 1000);
+    }
+    setInterval(createHeart, 300);
+
+    function pressKey(num) {
+        if (currentInput.length < 4) {
+            currentInput += num;
+            document.getElementById("pass-display").innerText = "* ".repeat(currentInput.length);
+        }
+        
+        if (currentInput.length === 4) {
+            setTimeout(() => {
+                if (currentInput === CORRECT_PASSCODE) {
+                    document.getElementById("pass-display").innerText = "Welcome!";
+                    document.getElementById("pass-display").style.color = "#4caf50";
+                    
+                    const music = document.getElementById("bg-music");
+                    music.play().catch(error => {
+                        console.log("Autoplay musik dicegah oleh browser.");
+                    });
+
+                    setTimeout(() => {
+                        document.getElementById("passcode-screen").style.display = "none";
+                        document.getElementById("main-screen").style.display = "block";
+                        // Otomatis menggulung layar kembali ke bagian atas saat berhasil login kado utama
+                        window.scrollTo({top: 0, behavior: 'smooth'});
+                    }, 500);
+                } else {
+                    document.getElementById("pass-display").innerText = "Wrong Code!";
+                    document.getElementById("pass-display").style.color = "#f44336";
+                    setTimeout(() => {
+                        clearKey();
+                    }, 800);
+                }
+            }, 300);
+        }
+    }
+
+    function clearKey() {
+        currentInput = "";
+        document.getElementById("pass-display").innerText = "Enter Passcode";
+        document.getElementById("pass-display").style.color = "#ec407a";
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+        
+        if(tabName === 'profile') {
+            document.getElementById('profile-sec').classList.add('active');
+            event.currentTarget.classList.add('active');
+        } else if(tabName === 'twenty') {
+            document.getElementById('twenty-sec').classList.add('active');
+            event.currentTarget.classList.add('active');
+        } else if(tabName === 'readme') {
+            document.getElementById('readme-sec').classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    }
+
+    function openLetter() {
+        const letter = document.getElementById('letter-content');
+        const envelope = document.getElementById('envelope-icon');
+        
+        if (letter.style.display === "block") {
+            letter.style.display = "none";
+            envelope.style.fill = "#f8bbd0";
+        } else {
+            letter.style.display = "block";
+            envelope.style.fill = "#ec407a";
+            // Memberikan jeda sedikit agar gulir layar otomatis ke arah teks surat yang baru saja dibuka
+            setTimeout(() => {
+                letter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+    }
+</script>
+
+</body>
+</html>
